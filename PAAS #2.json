@@ -1,0 +1,707 @@
+[
+    {
+        "id": "da6d76b97a8716df",
+        "type": "tab",
+        "label": "Flow 3",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2b1b37ef8bcbf009",
+        "type": "function",
+        "z": "da6d76b97a8716df",
+        "name": "Temperature",
+        "func": "return {payload:msg.payload.d.temp};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 400,
+        "wires": [
+            [
+                "5e91a0fdc6084f4b"
+            ]
+        ]
+    },
+    {
+        "id": "5e91a0fdc6084f4b",
+        "type": "switch",
+        "z": "da6d76b97a8716df",
+        "name": "temp thresh",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "20",
+                "vt": "str"
+            },
+            {
+                "t": "gt",
+                "v": "20",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 400,
+        "wires": [
+            [
+                "af8a49ca19bb4b35"
+            ],
+            [
+                "6be1a8759b2c4825"
+            ]
+        ]
+    },
+    {
+        "id": "97acabeaf2ec637a",
+        "type": "debug",
+        "z": "da6d76b97a8716df",
+        "name": "cpu status",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "ce9a8e02833b1b22",
+        "type": "debug",
+        "z": "da6d76b97a8716df",
+        "name": "device data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "complete": "true",
+        "x": 370,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "af8a49ca19bb4b35",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "safe",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "mustache",
+        "template": "Temperature ({{payload}}) within safe limits",
+        "x": 670,
+        "y": 380,
+        "wires": [
+            [
+                "97acabeaf2ec637a"
+            ]
+        ]
+    },
+    {
+        "id": "6be1a8759b2c4825",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "danger",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "mustache",
+        "template": "Temperature ({{payload}}) critical",
+        "x": 680,
+        "y": 420,
+        "wires": [
+            [
+                "97acabeaf2ec637a"
+            ]
+        ]
+    },
+    {
+        "id": "dc9fb3c1eabbb90c",
+        "type": "inject",
+        "z": "da6d76b97a8716df",
+        "name": "Send Data",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 100,
+        "y": 120,
+        "wires": [
+            [
+                "90aea6a6950dae4b"
+            ]
+        ]
+    },
+    {
+        "id": "90aea6a6950dae4b",
+        "type": "function",
+        "z": "da6d76b97a8716df",
+        "name": "Device payload",
+        "func": "// Thermostat's location:\nvar longitude1 =  [4.210484,9.081999,36.204824];\nvar latitude1 = [101.975766,8.675277,138.252924];\n\n//CO2\nvar carbon1 = [150,250,450,190,300,500];\n\n// Array of pseudo random temperatures\nvar temp1 = [15,17,18.5,20,21.5,23,24,22.2,19,18];\n\n// Array of pseudo random relative humidities\nvar humidity1 = [50,55,61,68,65,60,53,49,45,47];\n\n// Counter to select from array.\nvar counter1 = context.get('counter1')||0;\ncounter1 = counter1+1;\nif(counter1 > 9) counter1 = 0;\ncontext.set('counter1',counter1);\n\n// Counter to select from array.\nvar counter2 = context.get('counter2')||0;\ncounter2 = counter2+1;\nif(counter2 > 2) counter2 = 0;\ncontext.set('counter2',counter2);\n\n// Counter to select from array.\nvar counter3 = context.get('counter3')||0;\ncounter3 = counter3+1;\nif(counter3 > 5) counter3 = 0;\ncontext.set('counter3',counter3);\n\n\n// Create MQTT message in JSON\nmsg = {\n  payload: JSON.stringify(\n    {\n      d:{\n        \"temp\" : temp1[counter1],\n        \"humidity\" : humidity1[counter1],\n         \"longitude\" : longitude1[counter2],\n          \"latitude\" : latitude1[counter2],\n        \"C02\" : carbon1[counter3],\n      }\n    }\n  )\n};\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "dea52bb7421b40f5",
+                "8e51b278bbdca01c"
+            ]
+        ]
+    },
+    {
+        "id": "8e51b278bbdca01c",
+        "type": "debug",
+        "z": "da6d76b97a8716df",
+        "name": "Debug output payload",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "11f17c84c9059dce",
+        "type": "comment",
+        "z": "da6d76b97a8716df",
+        "name": "Device Simulator",
+        "info": "Sends simulated device sensor data to IBM Watson IoT Plaform.\n\nCan be configured to send on click or on an automatic interval.\n\n\n#Prerequisite\nOutput node device type and device ID need to match a device that it registered in a running IBM Watson IoT Platform service.\n\n# Watson IoT Platform docs\n[Connecting devices](https://www.bluemix.net/docs/services/IoT/iotplatform_task.html)",
+        "x": 100,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "395d8d73c993d6d3",
+        "type": "comment",
+        "z": "da6d76b97a8716df",
+        "name": "1. Configure target",
+        "info": "",
+        "x": 550,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "2fc105cb5d119bba",
+        "type": "comment",
+        "z": "da6d76b97a8716df",
+        "name": "2. Click to send data",
+        "info": "To automatically send data:\n1. Change *Repeat* to interval.\n2. Click Deploy button.\n",
+        "x": 110,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "cbc43005e27165e1",
+        "type": "comment",
+        "z": "da6d76b97a8716df",
+        "name": "Temperature Monitor",
+        "info": "",
+        "x": 110,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "a466565fd26abae0",
+        "type": "comment",
+        "z": "da6d76b97a8716df",
+        "name": "Configure source",
+        "info": "",
+        "x": 100,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "dea52bb7421b40f5",
+        "type": "ibmiot out",
+        "z": "da6d76b97a8716df",
+        "authentication": "apiKey",
+        "apiKey": "af6191fea2aaa4fd",
+        "outputType": "evt",
+        "deviceId": "amirul",
+        "deviceType": "2.0.6",
+        "eventCommandType": "event",
+        "format": "json",
+        "data": "temp:10",
+        "qos": "",
+        "name": "Send to IBM IoT Platform",
+        "service": "registered",
+        "x": 570,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "d971a01b21e68a91",
+        "type": "ibmiot in",
+        "z": "da6d76b97a8716df",
+        "authentication": "apiKey",
+        "apiKey": "af6191fea2aaa4fd",
+        "inputType": "evt",
+        "logicalInterface": "",
+        "ruleId": "",
+        "deviceId": "amirul",
+        "applicationId": "",
+        "deviceType": "+",
+        "eventType": "+",
+        "commandType": "",
+        "format": "json",
+        "name": "IBM IoT App In",
+        "service": "registered",
+        "allDevices": false,
+        "allApplications": false,
+        "allDeviceTypes": true,
+        "allLogicalInterfaces": false,
+        "allEvents": true,
+        "allCommands": false,
+        "allFormats": false,
+        "qos": "0",
+        "x": 100,
+        "y": 400,
+        "wires": [
+            [
+                "2b1b37ef8bcbf009",
+                "ce9a8e02833b1b22",
+                "8334bbeb947388e9",
+                "949c2de9f3a2301b",
+                "49994c7152ed125e"
+            ]
+        ]
+    },
+    {
+        "id": "8334bbeb947388e9",
+        "type": "function",
+        "z": "da6d76b97a8716df",
+        "name": "Humidity",
+        "func": "return {payload:msg.payload.d.humidity};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 500,
+        "wires": [
+            [
+                "1ec28035d696d7db"
+            ]
+        ]
+    },
+    {
+        "id": "1ec28035d696d7db",
+        "type": "switch",
+        "z": "da6d76b97a8716df",
+        "name": "Humidity Thresh",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "60",
+                "vt": "str"
+            },
+            {
+                "t": "gt",
+                "v": "60",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 500,
+        "y": 500,
+        "wires": [
+            [
+                "39ad8316bb889c89"
+            ],
+            [
+                "1818cf734a989fa4"
+            ]
+        ]
+    },
+    {
+        "id": "39ad8316bb889c89",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "Safe",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Humidity Value: ({{payload}}) is LOW !",
+        "output": "str",
+        "x": 670,
+        "y": 480,
+        "wires": [
+            [
+                "1020600f89fc0559"
+            ]
+        ]
+    },
+    {
+        "id": "1818cf734a989fa4",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "Danger",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Humidity Value: ({{payload}}) is High !",
+        "output": "str",
+        "x": 680,
+        "y": 520,
+        "wires": [
+            [
+                "1020600f89fc0559"
+            ]
+        ]
+    },
+    {
+        "id": "949c2de9f3a2301b",
+        "type": "function",
+        "z": "da6d76b97a8716df",
+        "name": "Country",
+        "func": "return {payload:msg.payload.d.longitude,payload1:msg.payload.d.latitude}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 620,
+        "wires": [
+            [
+                "74ce63961c028b0d"
+            ]
+        ]
+    },
+    {
+        "id": "74ce63961c028b0d",
+        "type": "switch",
+        "z": "da6d76b97a8716df",
+        "name": "Country Thresh",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "4.210484",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "101.975766",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "9.081999",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "8.675277",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "36.204824",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "138.252924",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 6,
+        "x": 500,
+        "y": 620,
+        "wires": [
+            [
+                "525e0a988381547e"
+            ],
+            [
+                "525e0a988381547e"
+            ],
+            [
+                "2ba8507b28bb9def"
+            ],
+            [
+                "2ba8507b28bb9def"
+            ],
+            [
+                "f3262cbe829ee940"
+            ],
+            [
+                "f3262cbe829ee940"
+            ]
+        ]
+    },
+    {
+        "id": "525e0a988381547e",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "Malaysia",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "({{payload}})({{payload1}}) You Are From Malaysia",
+        "output": "str",
+        "x": 680,
+        "y": 580,
+        "wires": [
+            [
+                "53686377627a8f7b"
+            ]
+        ]
+    },
+    {
+        "id": "2ba8507b28bb9def",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "Nigeria",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "({{payload}})({{payload1}}) You Are From Nigeria",
+        "output": "str",
+        "x": 680,
+        "y": 620,
+        "wires": [
+            [
+                "53686377627a8f7b"
+            ]
+        ]
+    },
+    {
+        "id": "f3262cbe829ee940",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "Japan",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "({{payload}})({{payload1}}) You Are From Japan",
+        "output": "str",
+        "x": 670,
+        "y": 660,
+        "wires": [
+            [
+                "53686377627a8f7b"
+            ]
+        ]
+    },
+    {
+        "id": "49994c7152ed125e",
+        "type": "function",
+        "z": "da6d76b97a8716df",
+        "name": "CO2",
+        "func": "return {payload:msg.payload.d.C02};",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 760,
+        "wires": [
+            [
+                "a7b389c358c166d4"
+            ]
+        ]
+    },
+    {
+        "id": "a7b389c358c166d4",
+        "type": "switch",
+        "z": "da6d76b97a8716df",
+        "name": "CO2 Thresh",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lt",
+                "v": "200",
+                "vt": "str"
+            },
+            {
+                "t": "btwn",
+                "v": "200",
+                "vt": "num",
+                "v2": "400",
+                "v2t": "num"
+            },
+            {
+                "t": "gt",
+                "v": "400",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 490,
+        "y": 760,
+        "wires": [
+            [
+                "f2115fd2e43a370d"
+            ],
+            [
+                "9a61c0e323cb2403"
+            ],
+            [
+                "e9ecb789aafc301d"
+            ]
+        ]
+    },
+    {
+        "id": "f2115fd2e43a370d",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "Low",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Value: ({{payload}}) CO2 Level is LOW",
+        "output": "str",
+        "x": 670,
+        "y": 720,
+        "wires": [
+            [
+                "46cffb364c2fef2c"
+            ]
+        ]
+    },
+    {
+        "id": "9a61c0e323cb2403",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "Moderate",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Value: ({{payload}}) CO2 Level is Moderate",
+        "output": "str",
+        "x": 680,
+        "y": 760,
+        "wires": [
+            [
+                "46cffb364c2fef2c"
+            ]
+        ]
+    },
+    {
+        "id": "e9ecb789aafc301d",
+        "type": "template",
+        "z": "da6d76b97a8716df",
+        "name": "High",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Value: ({{payload}}) CO2 Level is High",
+        "output": "str",
+        "x": 670,
+        "y": 800,
+        "wires": [
+            [
+                "46cffb364c2fef2c"
+            ]
+        ]
+    },
+    {
+        "id": "1020600f89fc0559",
+        "type": "debug",
+        "z": "da6d76b97a8716df",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "53686377627a8f7b",
+        "type": "debug",
+        "z": "da6d76b97a8716df",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "46cffb364c2fef2c",
+        "type": "debug",
+        "z": "da6d76b97a8716df",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "af6191fea2aaa4fd",
+        "type": "ibmiot",
+        "name": "IBM IOT",
+        "keepalive": "60",
+        "serverName": "",
+        "cleansession": true,
+        "appId": "",
+        "shared": false
+    }
+]
