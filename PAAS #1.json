@@ -1,0 +1,75 @@
+[
+    {
+        "id": "f283e4c9.300ec8",
+        "type": "tab",
+        "label": "Flow 3",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8cc72c1c.39528",
+        "type": "inject",
+        "z": "f283e4c9.300ec8",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 630,
+        "y": 200,
+        "wires": [
+            [
+                "c53dc921.debd68"
+            ]
+        ]
+    },
+    {
+        "id": "c53dc921.debd68",
+        "type": "function",
+        "z": "f283e4c9.300ec8",
+        "name": "Send My Text",
+        "func": "msg.payload=\"From Node-RED: Nice to see, Nice to hold, Once broken, Considered Sold\"\nmsg.topic=\"Hello node-red\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 860,
+        "y": 200,
+        "wires": [
+            [
+                "a9fb4a4c.2fbfb8",
+                "ff3874c.b5db888"
+            ]
+        ]
+    },
+    {
+        "id": "a9fb4a4c.2fbfb8",
+        "type": "debug",
+        "z": "f283e4c9.300ec8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1100,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "ff3874c.b5db888",
+        "type": "e-mail",
+        "z": "f283e4c9.300ec8",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "amirulaiman4100@gmail.com",
+        "dname": "Send To Email",
+        "x": 1100,
+        "y": 280,
+        "wires": []
+    }
+]
